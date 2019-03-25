@@ -12,43 +12,45 @@ namespace PilotTask1
     {
         static void Main(string[] args)
         {
-            string playerOne;
-            string playerTwo;
+            string firstPlayerName;
+            string secondPlayerName;
             string word;
-            int num = 0;
-            int index;
+            bool num = true;
+
             // Input names players
             Console.WriteLine("Введите имя первого игрока:");
-            playerOne = Console.ReadLine();
+            firstPlayerName = Console.ReadLine();
             Console.WriteLine("Введите имя второго игрока:");
-            playerTwo = Console.ReadLine();
-            Console.WriteLine("Играют {0} и {1}", playerOne, playerTwo);
+            secondPlayerName = Console.ReadLine();
+            Console.WriteLine("Играют {0} и {1}", firstPlayerName, secondPlayerName);
+
             // Enter start word, condition check and write to file.
-            while (num < 1)
+            while (num)
             {
-                Console.WriteLine("Введите начальное слово с маленькой буквы:");
-                word = Console.ReadLine();
-                Console.WriteLine(word.Length);
+                Console.WriteLine("Введите начальное слово от 8 до 30 букв:");
+                word = Console.ReadLine();;
                 if (word.Length >= 8 && word.Length <= 30)
                 {
-                    for (index = 0; index < word.Length; index++)
+                    for (int i = 0; i < word.Length; i++)
                     {
-                        if (!(char.IsLetter(word, index)))
+                        if (!(char.IsLetter(word, i)))
                         {
                             Console.WriteLine("В слове есть число или символ повторите ввод.");
-                            num = 0;
+                            num = true;
                             break;
                         }
                         else
                         {
                             File.WriteAllText("Task1.txt", word);
-                            num++;
+                            num = false;
                         }
                     }
                 }
+                else
+                    Console.WriteLine("Недостаточно букв в слове.");
             }
             word = File.ReadAllText("Task1.txt");
-            Game(playerOne, playerTwo, word);
+            Game(firstPlayerName, secondPlayerName, word);
 
             File.Delete("Task1.txt");
 
@@ -56,45 +58,49 @@ namespace PilotTask1
         }
 
         // Game class creation
-        public static void Game(string playerOne, string playerTwo, string word)
+        public static void Game(string firstPlayerName, string secondPlayerName, string word)
         {
             string playWord;
             int pointOne = 0, pointTwo = 0, count = 0;
             // Cycle game
             while (true)
             {
-                int countword = 0;
-                Console.WriteLine("Главное слово {0} {1}:{2} {3}:{4}", word, playerOne, pointOne, playerTwo, pointTwo);
+                int countWord = 0;
+                Console.WriteLine("Главное слово {0} {1}:{2} {3}:{4}", word, firstPlayerName, pointOne, secondPlayerName, pointTwo);
                 if ((count % 2) == 0)
-                    Console.WriteLine("{0} введите слово:", playerOne);
+                    Console.WriteLine("{0} введите слово:", firstPlayerName);
                 else
-                    Console.WriteLine("{0} введите слово:", playerTwo);
+                    Console.WriteLine("{0} введите слово:", secondPlayerName);
                 playWord = Console.ReadLine();
+
+                // If there isn't word then exit the cycle and the player lose.
+                if (playWord == "")
+                    break;
+
                 //There is a comparison of letters
                 for (int a = 0; a < playWord.Length; a++)
                 {
                     for (int j = 0; j < word.Length; j++)
                     {
-                        if (playWord[a] == word[j])
+                        if (playWord.ToLower()[a] == word.ToLower()[j])
                         {
-                            countword++;
+                            
+                            countWord++;
                             break;
                         }
                     }
 
                 }
-                // If there isn't word then exit the cycle and the player lose.
-                if (playWord == "")
-                    break;
+            
                 // If the word is normal comparison with the words entered earlier.
-                if (playWord.Length == countword)
+                if (playWord.Length == countWord)
                 {
                     using (StreamReader sr = new StreamReader("Task1.txt", Encoding.UTF8))
                     {
                         while (true)
                         {
                             string temp = sr.ReadLine();
-                            if (playWord == temp)
+                            if (String.Equals(playWord, temp))
                             {
                                 Console.WriteLine("Это слово уже было.");
                                 break;
@@ -124,19 +130,22 @@ namespace PilotTask1
                 else
                     Console.WriteLine("Такое слово нельзя составить.");
             }
-            DeterminationOfWin(playerOne, playerTwo, pointOne, pointTwo);
+            DeterminationOfWin(firstPlayerName, secondPlayerName, pointOne, pointTwo);
         }
         //Determination of winner.
-        public static void DeterminationOfWin(string playerOne, string playerTwo, int pointOne, int pointTwo)
+        public static void DeterminationOfWin(string firstPlayerName, string secondPlayerName, int pointOne, int pointTwo)
         {
-            string result;
             string winner;
             if (pointOne > pointTwo)
-                winner = playerOne;
+                winner = firstPlayerName;
+            if (pointOne == 0 && pointTwo == 0)
+                winner = "не определился";
             else
-                winner = playerTwo;
-            result = "Победил " + winner;
-            Console.WriteLine(result);
+                winner = secondPlayerName;
+            Console.WriteLine("Победитель " + winner);
         }
     }
 }
+
+
+
